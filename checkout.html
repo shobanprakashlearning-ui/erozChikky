@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eroz Chikky | Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --jaggery-gold: #C68E17;
+            --roasted-brown: #5C3A21;
+            --terracotta: #C35831;
+            --bg-cream: #FBF8F1;
+            --text-dark: #2C1E16;
+            --text-light: #5A4A42;
+            --white: #FFFFFF;
+            --border: rgba(92, 58, 33, 0.12);
+            --shadow: 0 12px 28px rgba(92, 58, 33, 0.08);
+            --font-head: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --transition: all 0.3s ease;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-cream);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4 { font-family: var(--font-head); color: var(--roasted-brown); }
+        a { text-decoration: none; color: inherit; }
+        .container { width: min(1180px, calc(100% - 2rem)); margin: 0 auto; }
+
+        .checkout-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(251, 248, 241, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .checkout-nav {
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .logo { font-family: var(--font-head); font-size: 1.8rem; font-weight: 700; color: var(--terracotta); }
+        .header-actions { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+        .secure-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(198, 142, 23, 0.12);
+            border: 1px solid rgba(198, 142, 23, 0.25);
+            color: var(--roasted-brown);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .page-shell { padding: 2rem 0 4rem; }
+        .page-title { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 0.45rem; }
+        .page-subtitle { color: var(--text-light); margin-bottom: 1.8rem; }
+        .delivery-note {
+            margin-top: 0.55rem;
+            padding: 0.75rem 0.9rem;
+            background: rgba(198, 142, 23, 0.08);
+            border: 1px solid rgba(198, 142, 23, 0.2);
+            border-radius: 12px;
+            color: var(--roasted-brown);
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .checkout-layout {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .checkout-form { padding: 1.25rem; }
+        .summary-card { padding: 1.25rem; align-self: start; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .field label {
+            font-size: 0.94rem;
+            color: var(--roasted-brown);
+            font-weight: 600;
+        }
+        .field input,
+        .field textarea,
+        .field select {
+            width: 100%;
+            border: 1px solid rgba(92, 58, 33, 0.16);
+            background: var(--bg-cream);
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            font: inherit;
+            color: var(--text-dark);
+            outline: none;
+        }
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            border-color: var(--terracotta);
+            box-shadow: 0 0 0 3px rgba(195, 88, 49, 0.12);
+        }
+        .field textarea { min-height: 120px; resize: vertical; }
+
+        .summary-card h2 { margin-bottom: 1rem; font-size: 1.8rem; }
+        .summary-list { display: grid; gap: 0.85rem; }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.9rem;
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+        #checkoutCoupon {
+            color: var(--terracotta);
+            font-weight: 700;
+        }
+        .summary-row.total {
+            margin-top: 0.6rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(92, 58, 33, 0.12);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--roasted-brown);
+        }
+        .amount-payable {
+            margin-top: 0.9rem;
+            padding: 1rem;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(198, 142, 23, 0.14), rgba(195, 88, 49, 0.08));
+            border: 1px solid rgba(198, 142, 23, 0.26);
+        }
+        .amount-payable .label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .amount-payable .value {
+            margin-top: 0.2rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--terracotta);
+        }
+
+        .promo-box {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(92, 58, 33, 0.1);
+        }
+        .coupon-row {
+            display: flex;
+            gap: 0.7rem;
+        }
+        .coupon-row input {
+            flex: 1;
+        }
+        .coupon-row input.success {
+            border-color: rgba(76, 175, 80, 0.6);
+            background: rgba(76, 175, 80, 0.06);
+        }
+        .coupon-row input.error {
+            border-color: rgba(195, 88, 49, 0.6);
+            background: rgba(195, 88, 49, 0.06);
+        }
+        .coupon-btn {
+            border: none;
+            border-radius: 12px;
+            background: var(--roasted-brown);
+            color: var(--white);
+            padding: 0.8rem 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .coupon-btn.success {
+            background: #2e8b57;
+        }
+        .coupon-btn.error {
+            background: var(--terracotta);
+        }
+        .coupon-hint {
+            margin-top: 0.5rem;
+            font-size: 0.88rem;
+            color: var(--text-light);
+        }
+        .promo-offer-badge {
+            margin-top: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.8rem;
+            border-radius: 999px;
+            background: rgba(198, 142, 23, 0.12);
+            border: 1px solid rgba(198, 142, 23, 0.22);
+            color: var(--roasted-brown);
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+        .coupon-message {
+            margin-top: 0.55rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--terracotta);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.75rem;
+            border-radius: 999px;
+            border: 1px solid rgba(195, 88, 49, 0.22);
+            background: rgba(195, 88, 49, 0.08);
+        }
+        .coupon-message.success {
+            color: #245b2a;
+            border-color: rgba(76, 175, 80, 0.35);
+            background: rgba(76, 175, 80, 0.12);
+        }
+        .coupon-message.error {
+            color: var(--terracotta);
+            border-color: rgba(195, 88, 49, 0.35);
+            background: rgba(195, 88, 49, 0.08);
+        }
+
+        .shipping-status {
+            display: none;
+            margin-top: 0.35rem;
+            padding: 0.35rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(76, 175, 80, 0.12);
+            border: 1px solid rgba(76, 175, 80, 0.35);
+            color: #245b2a;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .shipping-status.active {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .shipping-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.2rem;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(92, 58, 33, 0.08);
+        }
+        .order-item:last-child { border-bottom: none; }
+        .order-item-left {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            min-width: 0;
+        }
+        .order-thumb {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid rgba(92, 58, 33, 0.08);
+        }
+        .order-name { font-weight: 700; color: var(--roasted-brown); }
+        .order-meta { font-size: 0.88rem; color: var(--text-light); }
+        .order-price { color: var(--terracotta); font-weight: 700; }
+
+        .button-row { margin-top: 1.2rem; }
+        .place-order-btn {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            background: var(--terracotta);
+            color: var(--white);
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .place-order-btn:hover {
+            transform: translateY(-2px);
+            background: #a64726;
+            box-shadow: 0 8px 18px rgba(195, 88, 49, 0.28);
+        }
+
+        .success-message {
+            display: none;
+            margin-top: 1rem;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.35);
+            color: #245b2a;
+            padding: 0.9rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        @media (min-width: 900px) {
+            .checkout-layout {
+                grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.8fr);
+                align-items: start;
+            }
+            .summary-card { position: sticky; top: 96px; }
+        }
+
+        @media (max-width: 640px) {
+            .checkout-nav { flex-direction: column; align-items: flex-start; padding: 0.8rem 0; }
+            .header-actions { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+    <header class="checkout-header">
+        <div class="container checkout-nav">
+            <a href="index.html" class="logo">Eroz Chikky</a>
+            <div class="header-actions">
+                <a href="cart.html" style="color: var(--roasted-brown); font-weight: 600;">Back to Cart</a>
+                <div class="secure-badge">🔒 Secure Checkout</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <div class="container">
+            <h1 class="page-title">Checkout</h1>
+            <p class="page-subtitle">Complete your order with secure delivery details.</p>
+            <div class="delivery-note">Free delivery on orders above ₹500 • Same-day dispatch for Tamil Nadu orders</div>
+
+            <div class="checkout-layout">
+                <section class="panel checkout-form">
+                    <form id="checkoutForm">
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="fullName">Full Name</label>
+                                <input id="fullName" type="text" placeholder="Your name" required>
+                            </div>
+                            <div class="field">
+                                <label for="phone">Phone</label>
+                                <input id="phone" type="tel" placeholder="98765 43210" required>
+                            </div>
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input id="email" type="email" placeholder="you@example.com" required>
+                            </div>
+                            <div class="field" style="grid-column: 1 / -1;">
+                                <label for="address">Address</label>
+                                <textarea id="address" placeholder="House no., street, area" required></textarea>
+                            </div>
+                            <div class="field">
+                                <label for="city">City</label>
+                                <input id="city" type="text" placeholder="Chennai" required>
+                            </div>
+                            <div class="field">
+                                <label for="state">State</label>
+                                <select id="state" required>
+                                    <option value="">Select state</option>
+                                    <option>Tamil Nadu</option>
+                                    <option>Karnataka</option>
+                                    <option>Kerala</option>
+                                    <option>Telangana</option>
+                                    <option>Andhra Pradesh</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="zipcode">ZIP Code</label>
+                                <input id="zipcode" type="text" placeholder="600001" required>
+                            </div>
+                        </div>
+
+                        <div class="promo-box">
+                            <div class="field">
+                                <label for="couponCode">Promo Code</label>
+                                <div class="coupon-row">
+                                    <input id="couponCode" type="text" placeholder="Try EROZ10">
+                                    <button type="button" class="coupon-btn" id="applyCoupon">Apply</button>
+                                </div>
+                                <div class="coupon-hint">Use <strong>EROZ10</strong> for 10% off your order.</div>
+                                <div class="promo-offer-badge">🎁 Offer valid on orders above ₹1,000</div>
+                                <div class="coupon-message" id="couponMessage"></div>
+                            </div>
+                        </div>
+
+                        <div class="button-row">
+                            <button type="submit" class="place-order-btn">Place Order</button>
+                        </div>
+                        <div class="success-message" id="successMessage">Order placed successfully. Your sweet box is on the way.</div>
+                    </form>
+                </section>
+
+                <aside class="panel summary-card">
+                    <h2>Order Summary</h2>
+                    <div id="checkoutItems"></div>
+                    <div class="summary-list">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <strong id="checkoutSubtotal">₹0</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span>Coupon</span>
+                            <strong id="checkoutCoupon">₹0</strong>
+                        </div>
+                        <div class="summary-row" id="shippingRow">
+                            <span>Estimated Shipping</span>
+                            <div class="shipping-meta">
+                                <strong id="checkoutShipping">₹49</strong>
+                                <div class="shipping-status" id="shippingStatusBadge">Free delivery unlocked</div>
+                            </div>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <strong id="checkoutTotal">₹49</strong>
+                        </div>
+                    </div>
+                    <div class="amount-payable">
+                        <div class="label">Amount Payable</div>
+                        <div class="value" id="checkoutAmountPayable">₹49</div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const storageKey = 'erozChikkyCart';
+        const ordersStorageKey = 'erozChikkyOrders';
+        const shipping = 49;
+        const productTitleMap = {
+            'Sesame Chikki': 'Sesame (Ellu) Chikki',
+            'Dry Fruit Chikki': 'Dry Fruit & Nut Chikki'
+        };
+        const productImageMap = {
+            'Classic Peanut Chikki': 'images/classic-peanut-chikki.png',
+            'Peanut Ball': 'images/PeanutBall.png',
+            'Sesame (Ellu) Chikki': 'images/SesameChikki.png',
+            'Dry Fruit & Nut Chikki': 'images/DryFruitChikki.png'
+        };
+        const couponRules = {
+            EROZ10: {
+                discountRate: 0.10,
+                minAmount: 1000
+            }
+        };
+        let appliedCoupon = '';
+        let couponDiscount = 0;
+
+        const checkoutItems = document.getElementById('checkoutItems');
+        const checkoutSubtotal = document.getElementById('checkoutSubtotal');
+        const checkoutCoupon = document.getElementById('checkoutCoupon');
+        const checkoutTotal = document.getElementById('checkoutTotal');
+        const checkoutAmountPayable = document.getElementById('checkoutAmountPayable');
+        const shippingRow = document.getElementById('shippingRow');
+        const shippingStatusBadge = document.getElementById('shippingStatusBadge');
+        const couponCodeInput = document.getElementById('couponCode');
+        const applyCouponBtn = document.getElementById('applyCoupon');
+        const couponMessage = document.getElementById('couponMessage');
+        const form = document.getElementById('checkoutForm');
+        const successMessage = document.getElementById('successMessage');
+
+        function getCart() {
+            try {
+                const savedCart = JSON.parse(localStorage.getItem(storageKey));
+                return savedCart && Array.isArray(savedCart.items) ? savedCart : { items: [] };
+            } catch {
+                return { items: [] };
+            }
+        }
+
+        function getOrders() {
+            try {
+                const savedOrders = JSON.parse(localStorage.getItem(ordersStorageKey));
+                return Array.isArray(savedOrders) ? savedOrders : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveOrders(orders) {
+            localStorage.setItem(ordersStorageKey, JSON.stringify(orders));
+        }
+
+        function generateOrderId() {
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[-:T.]/g, '').slice(0, 14);
+            const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `EROZ-${timestamp}-${randomPart}`;
+        }
+
+        function normalizeCartImages(cart) {
+            cart.items = cart.items.map(item => {
+                const normalizedTitle = productTitleMap[item.title] || item.title;
+                return {
+                    ...item,
+                    title: normalizedTitle,
+                    image: productImageMap[normalizedTitle] || item.image
+                };
+            });
+            return cart;
+        }
+
+        function renderSummary() {
+            const cart = normalizeCartImages(getCart());
+            const itemList = cart.items || [];
+            const subtotal = itemList.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const shippingCharge = subtotal >= 500 ? 0 : shipping;
+            const payableSubtotal = Math.max(subtotal - couponDiscount, 0);
+            const total = payableSubtotal + shippingCharge;
+
+            checkoutItems.innerHTML = itemList.length ? itemList.map(item => `
+                <div class="order-item">
+                    <div class="order-item-left">
+                        <img class="order-thumb" src="${item.image}" alt="${item.title}">
+                        <div>
+                            <div class="order-name">${item.title}</div>
+                            <div class="order-meta">Qty: ${item.quantity}</div>
+                        </div>
+                    </div>
+                    <div class="order-price">₹${item.price * item.quantity}</div>
+                </div>
+            `).join('') : '<p style="color: var(--text-light);">Your cart is empty.</p>';
+
+            shippingRow.style.display = itemList.length ? 'flex' : 'none';
+            shippingStatusBadge.classList.toggle('active', itemList.length ? subtotal >= 500 : false);
+            checkoutSubtotal.textContent = `₹${subtotal}`;
+            checkoutCoupon.textContent = `-₹${couponDiscount}`;
+            checkoutCoupon.style.color = couponDiscount > 0 ? 'var(--terracotta)' : 'var(--text-light)';
+            checkoutTotal.textContent = `₹${itemList.length ? total : 0}`;
+            checkoutAmountPayable.textContent = `₹${itemList.length ? total : 0}`;
+            document.getElementById('checkoutShipping').textContent = itemList.length ? `₹${shippingCharge}` : '';
+        }
+
+        function setCouponFeedback(isSuccess, message) {
+            couponMessage.textContent = `${isSuccess ? '✓' : '!' } ${message}`;
+            couponMessage.classList.toggle('success', isSuccess);
+            couponMessage.classList.toggle('error', !isSuccess);
+            couponCodeInput.classList.toggle('success', isSuccess);
+            couponCodeInput.classList.toggle('error', !isSuccess);
+            applyCouponBtn.classList.toggle('success', isSuccess);
+            applyCouponBtn.classList.toggle('error', !isSuccess);
+        }
+
+        applyCouponBtn.addEventListener('click', () => {
+            const enteredCode = couponCodeInput.value.trim().toUpperCase();
+            const cart = getCart();
+            const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const selectedRule = couponRules[enteredCode];
+
+            if (!enteredCode || !selectedRule) {
+                couponDiscount = 0;
+                appliedCoupon = '';
+                setCouponFeedback(false, 'Invalid promo code. Try EROZ10.');
+                renderSummary();
+                return;
+            }
+
+            if (subtotal < selectedRule.minAmount) {
+                couponDiscount = 0;
+                appliedCoupon = '';
+                setCouponFeedback(false, `Promo code ${enteredCode} is valid only for orders above ₹${selectedRule.minAmount}.`);
+                renderSummary();
+                return;
+            }
+
+            appliedCoupon = enteredCode;
+            couponDiscount = Math.round(subtotal * selectedRule.discountRate);
+            setCouponFeedback(true, `Promo code ${appliedCoupon} applied successfully.`);
+            renderSummary();
+        });
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const cart = normalizeCartImages(getCart());
+            if (!cart.items.length) {
+                successMessage.textContent = 'Your cart is empty. Add items before placing an order.';
+                successMessage.style.display = 'block';
+                return;
+            }
+
+            const orderId = generateOrderId();
+            const orders = getOrders();
+            const order = {
+                orderId,
+                createdAt: new Date().toISOString(),
+                items: cart.items,
+                subtotal: cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                couponDiscount,
+                appliedCoupon: appliedCoupon || null,
+                total: cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0) - couponDiscount
+            };
+
+            orders.push(order);
+            saveOrders(orders);
+
+            successMessage.innerHTML = `Order placed successfully. Your sweet box is on the way.<br><strong>Order ID: ${orderId}</strong>`;
+            successMessage.style.display = 'block';
+            localStorage.removeItem(storageKey);
+            appliedCoupon = '';
+            couponDiscount = 0;
+            couponCodeInput.value = '';
+            couponMessage.textContent = '';
+            couponCodeInput.classList.remove('success', 'error');
+            applyCouponBtn.classList.remove('success', 'error');
+            couponMessage.classList.remove('success', 'error');
+            renderSummary();
+            form.reset();
+        });
+
+        renderSummary();
+    </script>
+</body>
+</html>

@@ -148,6 +148,9 @@
             position: relative;
             cursor: pointer;
             font-size: 1.2rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .cart-count {
@@ -241,6 +244,35 @@
             font-size: 1.2rem;
             color: var(--terracotta);
             margin-bottom: 1rem;
+        }
+
+        .product-qty-control {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.9rem;
+        }
+
+        .product-qty-control.active {
+            display: flex;
+        }
+
+        .product-qty-control .qty-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 999px;
+            background: rgba(198, 142, 23, 0.12);
+            color: var(--roasted-brown);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .product-qty-control .qty-value {
+            min-width: 26px;
+            font-weight: 700;
+            color: var(--terracotta);
         }
 
         /* Features Section */
@@ -451,10 +483,10 @@
             </ul>
 
             <div class="nav-actions">
-                <div class="cart-icon">
+                <a href="cart.html" class="cart-icon" aria-label="Open shopping cart">
                     🛒
                     <span class="cart-count" id="cartCount">0</span>
-                </div>
+                </a>
                 <div class="menu-toggle" id="menuToggle">☰</div>
             </div>
         </div>
@@ -479,45 +511,65 @@
                 <!-- Product 1 -->
                 <div class="product-card">
                     <!-- High-quality warm food placeholders -->
-                    <img src="images/classic-peanut-chikki.png" alt="Classic Peanut Chikki" class="product-img">
+                    <img src="images/classic-peanut-chikki.png" alt="Classic Peanut Chikki" class="product-img" data-image="images/classic-peanut-chikki.png">
                     <div class="product-info">
                         <h3 class="product-title">Classic Peanut Chikki</h3>
                         <p class="product-desc">Whole roasted peanuts bound in rich, golden jaggery syrup.</p>
                         <div class="product-price">₹150 <span style="font-size: 0.8rem; color: #888;">/ 250g</span></div>
                         <button class="btn-primary add-to-cart">Add to Cart</button>
+                        <div class="product-qty-control">
+                            <button type="button" class="qty-btn" data-action="decrease">−</button>
+                            <span class="qty-value">0</span>
+                            <button type="button" class="qty-btn" data-action="increase">+</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Product 2 -->
                 <div class="product-card">
-                    <img src="images/PeanutBall.png" alt="Peanut Ball" class="product-img">
+                    <img src="images/PeanutBall.png" alt="Peanut Ball" class="product-img" data-image="images/PeanutBall.png">
                     <div class="product-info">
                         <h3 class="product-title">Peanut Ball</h3>
                         <p class="product-desc">Roasted peanuts in a Ball, crunchy texture.</p>
                         <div class="product-price">₹160 <span style="font-size: 0.8rem; color: #888;">/ 250g</span></div>
                         <button class="btn-primary add-to-cart">Add to Cart</button>
+                        <div class="product-qty-control">
+                            <button type="button" class="qty-btn" data-action="decrease">−</button>
+                            <span class="qty-value">0</span>
+                            <button type="button" class="qty-btn" data-action="increase">+</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Product 3 -->
                 <div class="product-card">
-                    <img src="images/SesameChikki.png" alt="Sesame Chikki" class="product-img">
+                    <img src="images/SesameChikki.png" alt="Sesame Chikki" class="product-img" data-image="images/SesameChikki.png">
                     <div class="product-info">
                         <h3 class="product-title">Sesame (Ellu) Chikki</h3>
                         <p class="product-desc">Toasted white and black sesame seeds. A winter favorite.</p>
                         <div class="product-price">₹180 <span style="font-size: 0.8rem; color: #888;">/ 250g</span></div>
                         <button class="btn-primary add-to-cart">Add to Cart</button>
+                        <div class="product-qty-control">
+                            <button type="button" class="qty-btn" data-action="decrease">−</button>
+                            <span class="qty-value">0</span>
+                            <button type="button" class="qty-btn" data-action="increase">+</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Product 4 -->
                 <div class="product-card">
-                    <img src="images/DryFruitChikki.png" alt="Dry Fruit Chikki" class="product-img">
+                    <img src="images/DryFruitChikki.png" alt="Dry Fruit Chikki" class="product-img" data-image="images/DryFruitChikki.png">
                     <div class="product-info">
                         <h3 class="product-title">Dry Fruit & Nut Chikki</h3>
                         <p class="product-desc">A premium blend of cashews, almonds, and pistachios.</p>
                         <div class="product-price">₹350 <span style="font-size: 0.8rem; color: #888;">/ 250g</span></div>
                         <button class="btn-primary add-to-cart">Add to Cart</button>
+                        <div class="product-qty-control">
+                            <button type="button" class="qty-btn" data-action="decrease">−</button>
+                            <span class="qty-value">0</span>
+                            <button type="button" class="qty-btn" data-action="increase">+</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -660,26 +712,125 @@
         });
 
         // Shopping Cart Logic
+        const storageKey = 'erozChikkyCart';
         const addToCartButtons = document.querySelectorAll('.add-to-cart');
         const cartCountElement = document.getElementById('cartCount');
-        let cartTotal = 0;
+        const productCards = document.querySelectorAll('.product-card');
+        const productTitleMap = {
+            'Sesame Chikki': 'Sesame (Ellu) Chikki',
+            'Dry Fruit Chikki': 'Dry Fruit & Nut Chikki'
+        };
+
+        function getCart() {
+            try {
+                const savedCart = JSON.parse(localStorage.getItem(storageKey));
+                return savedCart && Array.isArray(savedCart.items) ? savedCart : { items: [] };
+            } catch (error) {
+                return { items: [] };
+            }
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem(storageKey, JSON.stringify(cart));
+        }
+
+        function updateCartCount() {
+            const cart = getCart();
+            const cartTotal = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountElement.textContent = cartTotal;
+        }
+
+        function syncProductQtyControls() {
+            const cart = getCart();
+
+            productCards.forEach(card => {
+                const title = card.querySelector('.product-title').textContent.trim();
+                const normalizedTitle = productTitleMap[title] || title;
+                const existingItem = cart.items.find(item => (productTitleMap[item.title] || item.title).toLowerCase() === normalizedTitle.toLowerCase());
+                const qtyControl = card.querySelector('.product-qty-control');
+                const qtyValue = card.querySelector('.qty-value');
+
+                if (existingItem && existingItem.quantity > 0) {
+                    qtyControl.classList.add('active');
+                    qtyValue.textContent = existingItem.quantity;
+                } else {
+                    qtyControl.classList.remove('active');
+                    qtyValue.textContent = '0';
+                }
+            });
+        }
+
+        function addToCart(productCard) {
+            const title = productCard.querySelector('.product-title').textContent.trim();
+            const normalizedTitle = productTitleMap[title] || title;
+            const priceText = productCard.querySelector('.product-price').textContent;
+            const priceMatch = priceText.match(/\d+/);
+            const price = priceMatch ? Number(priceMatch[0]) : 0;
+            const productImage = productCard.querySelector('.product-img');
+            const image = productImage.dataset.image || productImage.src;
+            const cart = getCart();
+            const existingItem = cart.items.find(item => (productTitleMap[item.title] || item.title).toLowerCase() === normalizedTitle.toLowerCase());
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+                existingItem.image = image;
+                existingItem.title = normalizedTitle;
+            } else {
+                cart.items.push({
+                    title: normalizedTitle,
+                    price,
+                    image,
+                    quantity: 1
+                });
+            }
+
+            saveCart(cart);
+            updateCartCount();
+            syncProductQtyControls();
+        }
+
+        document.addEventListener('click', (event) => {
+            const qtyButton = event.target.closest('.product-qty-control .qty-btn');
+            if (!qtyButton) return;
+
+            const productCard = qtyButton.closest('.product-card');
+            const title = productCard.querySelector('.product-title').textContent.trim();
+            const normalizedTitle = productTitleMap[title] || title;
+            const cart = getCart();
+            const existingItem = cart.items.find(item => (productTitleMap[item.title] || item.title).toLowerCase() === normalizedTitle.toLowerCase());
+
+            if (!existingItem) return;
+
+            if (qtyButton.dataset.action === 'increase') {
+                existingItem.quantity += 1;
+            } else if (existingItem.quantity > 1) {
+                existingItem.quantity -= 1;
+            } else {
+                cart.items = cart.items.filter(item => (productTitleMap[item.title] || item.title).toLowerCase() !== normalizedTitle.toLowerCase());
+            }
+
+            saveCart(cart);
+            updateCartCount();
+            syncProductQtyControls();
+        });
 
         addToCartButtons.forEach(button => {
             button.addEventListener('click', function() {
-                cartTotal++;
-                cartCountElement.textContent = cartTotal;
-                
-                // Visual feedback
+                addToCart(this.closest('.product-card'));
+
                 const originalText = this.textContent;
-                this.textContent = "Added!";
-                this.style.backgroundColor = "#4CAF50"; // Green success color
-                
+                this.textContent = 'Added!';
+                this.style.backgroundColor = '#4CAF50';
+
                 setTimeout(() => {
                     this.textContent = originalText;
-                    this.style.backgroundColor = "var(--terracotta)"; // Reset color
+                    this.style.backgroundColor = 'var(--terracotta)';
                 }, 1500);
             });
         });
+
+        updateCartCount();
+        syncProductQtyControls();
     </script>
 </body>
 </html>
